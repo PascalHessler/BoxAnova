@@ -5,6 +5,8 @@ description = ""
 authors = ["PascalHessler <PascalHessler@outlook.de>"]
 readme = "README.md"
 packages = [{include = "BoxAnova"}]
+repository = "https://github.com/PascalHessler/BoxAnova"
+keywords = ["anova", "boxplot"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
