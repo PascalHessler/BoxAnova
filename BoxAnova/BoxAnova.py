@@ -58,7 +58,7 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
         additional_texts = [additional_texts for _ in range(len(variables))]
 
     if not hue:
-        display = "group"
+        display: Literal['group', 'hue', 'both'] = "group"
         warnings.warn("Hue is not provided. Display type was changed to 'group'")
 
     for title, subtitle, note, additional_texts, var in zip(titles, subtitles, notes, additional_texts, variables):
