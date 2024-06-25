@@ -125,7 +125,6 @@ class BoxAnova:
                  title: str = "", subtitle: str = "",
                  note: str = "", additional_text: str = "",
 
-                 show_fig: bool = True,
                  box_kws: dict = None,
                  **kwargs):
         """
@@ -144,7 +143,6 @@ class BoxAnova:
         :param subtitle: The subtitle of the plot
         :param note: The note of the plot
         :param additional_text: Additional text which will be displayed at the bottom of the plot
-        :param show_fig: If True the plot will be shown
         :param box_kws: Additional arguments for the boxplot passed to seaborn.boxplot
         :param kwargs: Additional arguments for the BoxAnova class
         """
@@ -177,6 +175,7 @@ class BoxAnova:
         self.fig = None
         self.ax = None
         self.show_fig = show_fig
+
         self.kwargs = kwargs
 
         if box_kws is None:
