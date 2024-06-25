@@ -175,7 +175,7 @@ class BoxAnova:
         self.fig = None
         self.ax = None
         self.hue = None
-        self.hue_order = None
+        self.hue_order = []
 
         self.kwargs = kwargs
 
@@ -400,9 +400,6 @@ class BoxAnova:
 
         match display:
             case 'group':
-                if hue:
-                    warnings.warn("You provided the hue argument but selected to only show group."
-                                  " This might be not intended")
                 self.calc_sig_levels_group(hue=False)
             case 'hue':
                 self.calc_sig_levels_hue(hue=hue, hue_order=hue_order, show_group=False)
@@ -468,7 +465,7 @@ class BoxAnova:
         self.hue = hue
         if not hue_order:
             hue_order = list(self.df[hue].unique())
-            self.hue_order = hue_order
+        self.hue_order = hue_order
         if fine_tuning_kws is None:
             fine_tuning_kws = {}
 
