@@ -38,6 +38,32 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
                        labels: Labels = None,
                        show_fig: bool = True,
                        **kwargs):
+    """
+    Generating BoxPlots for multiple variables
+    :param variables: For each variable a boxplot will be generated
+    :param data: the DataFrame containing the data
+    :param group: The Grouping variable, which will be used to separate the data
+    :param hue:  The hue variable, which will be used to separate the data
+    :param hue_order:  The order of the hue variable
+    :param display: There are three types to display the data: 'group', 'hue', 'both'. With 'group' the data will be
+    only split by grop and the Anova is only based on this.
+    When using "hue" both group and hue are used to plot the boxplot, but the Anova is only shown or the differences in hue by group.
+    With 'both' the data is split by group and hue and the Anova is based on the group and hue separately.
+    :param all_separate: This allows to create plots for all three display types.
+    :param orient: You can choose between 'v' and 'h' for vertical and horizontal orientation
+    :param titles: The titles of the plots, when no title is provided the variable name will be used like this 'Anova of ' + variable + ' by ' + group
+    :param subtitles: The subtitles of the plots
+    :param notes: The notes of the plots, these are additional information which will be displayed at the bottom of the plot
+    :param additional_texts: Additional texts which will be displayed at the bottom of the plot
+    :param save_to_file: If True the plots will be saved to a file, but the path must be provided in settings_save
+    :param settings_save: The settings for saving the plots
+    :param get_labels: TBA
+    :param labels: TBA
+    :param show_fig: If True the plots will be shown
+    :param box_kws: Additional arguments for the boxplot passed to seaborn.boxplot
+    :param kwargs: Additional arguments for the BoxAnova class
+    :return:
+    """
     if labels:
         titles = []
         subtitles = []
@@ -101,6 +127,26 @@ class BoxAnova:
                  show_fig: bool = True,
                  box_kws: dict = None,
                  **kwargs):
+        """
+
+        :param df: The DataFrame containing the data
+        :param variable: The variable which should be used for the Anova
+        :param group: The Grouping variable, which will be used to separate the data
+        :param order: The order of the groups
+        :param orient: The orientation of the plot 'v' for vertical and 'h' for horizontal
+        :param method: The method for the correction of the p-values, either 'bonf' or 'sidak'
+        :param alpha: The alpha value for the p-values
+        :param use_corrected_p: If True the corrected p-values will be used, this is an correction when using Anova for multiple groups.
+        :param palette: The color palette for the plot
+        :param background_color: The background color of the plot
+        :param title: The title of the plot
+        :param subtitle: The subtitle of the plot
+        :param note: The note of the plot
+        :param additional_text: Additional text which will be displayed at the bottom of the plot
+        :param show_fig: If True the plot will be shown
+        :param box_kws: Additional arguments for the boxplot passed to seaborn.boxplot
+        :param kwargs: Additional arguments for the BoxAnova class
+        """
         self.df = df
         self.variable = variable
         self.orient = orient
@@ -111,7 +157,7 @@ class BoxAnova:
         self.title = title
         self.subtitle = subtitle
         self.note = note
-        # fügt #\n hinzu wenn zusätzlicher Text vorhanden sit
+        # adds a linebreak when additional text is not empty
         self.additional_text = "\n" + additional_text if additional_text else additional_text
 
         self.method = method
@@ -131,8 +177,11 @@ class BoxAnova:
         self.ax = None
         self.show_fig = show_fig
         self.kwargs = kwargs
-        self.box_kws = box_kws if box_kws else {"showmeans": True,
-                                                "meanprops": {"markerfacecolor": "white", "markeredgecolor": "black"}}
+
+        if box_kws is None:
+            box_kws = {}
+        self.box_kws = {"showmeans": True, "meanprops": {"markerfacecolor": "white", "markeredgecolor": "black"},
+                        **box_kws}
 
     @staticmethod
     def show():
