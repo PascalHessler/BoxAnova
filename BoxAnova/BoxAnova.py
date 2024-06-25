@@ -65,7 +65,7 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
         box = BoxAnova(df=data, variable=var, group=group, title=title, subtitle=subtitle, note=note,
                        additional_text=additional_texts, show_fig=show_fig, orient=orient, **kwargs)
         if all_separate:
-            file_prefix = settings_save['file_prefix']
+            file_prefix = settings_save.get('file_prefix', "")
             settings_save["file_prefix"] = f"group_{file_prefix}"
             box.generate_box_plot(hue=hue, hue_order=hue_order, display="group", save=save_to_file, show=show_fig,
                                   settings_save=settings_save, )
