@@ -131,7 +131,8 @@ class BoxAnova:
         self.ax = None
         self.show_fig = show_fig
         self.kwargs = kwargs
-        self.box_kws = box_kws if box_kws else {}
+        self.box_kws = box_kws if box_kws else {"showmeans": True,
+                                                "meanprops": {"markerfacecolor": "white", "markeredgecolor": "black"}}
 
     @staticmethod
     def show():
@@ -180,10 +181,11 @@ class BoxAnova:
 
     @property
     def max_value_on_scale(self):
+        if self.box_kws.get("showfliers", True) is False:
+            return self.df[self.variable].quantile(0.975)
         return self.df[self.variable].max()
 
     def plot_box_plot(self, hue: str = None, hue_order: list[str] = None, formatting_text: bool = True,
-                      showmeans: bool = True, meanprops: dict = None,
                       position_title: float = 1.04, position_offset: float = 0.05
                       ):
         # make sure canvas is clear
@@ -193,9 +195,6 @@ class BoxAnova:
         if hue:
             optional_params['hue'] = hue
             optional_params['hue_order'] = hue_order
-
-        if meanprops is None:
-            meanprops = {"markerfacecolor": "white", "markeredgecolor": "black"}
 
         # create plot
         self.fig, self.ax = plt.subplots()
@@ -211,9 +210,8 @@ class BoxAnova:
                 x = self.group
                 y = self.variable
 
-            self.ax = sns.boxplot(data=self.df, x=x, y=y, order=self.order, showmeans=showmeans,
-                                  meanprops=meanprops, ax=self.ax, palette=self.palette, **optional_params,
-                                  **self.box_kws
+            self.ax = sns.boxplot(data=self.df, x=x, y=y, order=self.order, ax=self.ax, palette=self.palette,
+                                  **optional_params, **self.box_kws
                                   )
         if formatting_text:
             renaming(self.ax)
