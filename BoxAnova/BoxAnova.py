@@ -351,14 +351,11 @@ class BoxAnova:
             text = f"{mean_text}"
         return text
 
-    def calc_tick_x_line(self, i, j, k, position_offset: float = 0, fix_position: bool = False) \
+    def calc_tick_x_line(self, i, j, k, position_offset: float = 0) \
             -> tuple[float, float, float]:
-        tick_size: float = math.ceil(self.max_value_on_scale * 0.1, ) - 0.5
+        tick_size: float = self.max_value_on_scale * 0.1
 
-        if fix_position:
-            x_line = self.max_value_on_scale + 1 * tick_size
-        else:
-            x_line = self.max_value_on_scale + k * tick_size
+        x_line = self.max_value_on_scale + k * tick_size
 
         x_line += position_offset
         y_text = (j + i) / 2
@@ -431,7 +428,7 @@ class BoxAnova:
 
         plt.close()
 
-    def calc_sig_levels_group(self, hue=False, rate_position_offset_with_hue=0.1, fine_tuning_kws: dict = None):
+    def calc_sig_levels_group(self, hue=False, rate_position_offset_with_hue=0.15, fine_tuning_kws: dict = None):
         if fine_tuning_kws is None:
             fine_tuning_kws = {}
         if self.ax is None:
@@ -487,7 +484,7 @@ class BoxAnova:
                 # based on hue order
                 i = group_start + hue_1_mid
                 j = group_start + hue_2_mid
-                tick_size, x_line, y_text = self.calc_tick_x_line(fix_position=False, position_offset=0.3,
+                tick_size, x_line, y_text = self.calc_tick_x_line(position_offset=self.max_value_on_scale*0.01,
                                                                   i=i, j=j, k=k)
                 self.draw_lines(i, j, tick_size, x_line)
                 index = df_res[(df_res["group1"] == name_group_1) & (df_res["group2"] == name_group_2)].index
