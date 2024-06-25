@@ -37,6 +37,7 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
                        get_labels: bool = False,
                        labels: Labels = None,
                        show_fig: bool = True,
+                       box_kws: dict = None,
                        **kwargs):
     """
     Generating BoxPlots for multiple variables
@@ -89,7 +90,7 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
 
     for title, subtitle, note, additional_texts, var in zip(titles, subtitles, notes, additional_texts, variables):
         box = BoxAnova(df=data, variable=var, group=group, title=title, subtitle=subtitle, note=note,
-                       additional_text=additional_texts, show_fig=show_fig, orient=orient, **kwargs)
+                       additional_text=additional_texts, show_fig=show_fig, orient=orient, box_kws=box_kws, **kwargs)
         if all_separate:
             file_prefix = settings_save.get('file_prefix', "")
             settings_save["file_prefix"] = f"group_{file_prefix}"
