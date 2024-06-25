@@ -223,7 +223,9 @@ class BoxAnova:
         if hue:
             position_height += position_offset
             sns.move_legend(self.ax, "lower center",
-                            bbox_to_anchor=(.5, position_height - position_offset * 2),
+                            bbox_to_anchor=(.5,
+                                            position_height - position_offset * 3 if self.subtitle else
+                                            position_height - position_offset * 2),
                             ncol=len(self.df[hue].unique()), title=None, frameon=False, )
 
         self.ax.text(x=0.5, y=position_height, s=self.title, fontsize=14, weight='bold', ha='center', va='bottom',
