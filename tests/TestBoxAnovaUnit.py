@@ -1,5 +1,5 @@
 import unittest
-from BoxAnova import BoxAnova
+from BoxAnova import BoxAnova, multiple_box_anova
 import pandas as pd
 import numpy as np
 
@@ -89,13 +89,32 @@ class TestBoxAnova(unittest.TestCase):
         except Exception as e:
             self.fail(f"plot_box_plot method raised exception {e}")
 
-
     def test_generate_box_plot(self):
         # Test that generate_box_plot method works without raising an exception
         try:
             self.box_anova.generate_box_plot(display='group')
         except Exception as e:
             self.fail(f"generate_box_plot method raised exception {e}")
+
+    def test_multi_group(self):
+        multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
+                           display='group')
+
+    def test_multi_group_no_fliers(self):
+        multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
+                           display='group', box_kws={"showfliers": False})
+
+    def test_multi_group_hue(self):
+        multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
+                           hue="hue")#
+
+    def test_multi_group_hue_no_fliers(self):
+        multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
+                           hue="hue", box_kws={"showfliers": False})
+
+    def test_multi_group_hue_reserved(self):
+        multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="hue",
+                           hue="group")
 
     # def invalid_order_value(self):
     #     with self.assertRaises(ValueError, msg="Invalid order not in list of groups"):
