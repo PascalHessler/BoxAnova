@@ -174,7 +174,7 @@ class BoxAnova:
 
         self.fig = None
         self.ax = None
-        self.show_fig = show_fig
+        self.hue = None
 
         self.kwargs = kwargs
 
@@ -186,6 +186,31 @@ class BoxAnova:
     @staticmethod
     def show():
         plt.show()
+
+    @property
+    def start_point(self):
+        return self.alpha_boarders.index(self.alpha)
+
+    @property
+    def max_value_on_scale(self):
+        if self.box_kws.get("showfliers", True) is False:
+            # Calculating the whiskers for each scenario group and hue,
+            # since the whiskers calculated above the complete variable is to inaccurate.
+            whiskers = []
+            for group in self.order:
+                df = self.df.copy()
+                df = df[df[self.group] == group]
+                if self.hue:
+                    for hue in self.df[self.hue].unique():
+                        df_hue = df[df[self.hue] == hue]
+                        iqr = df_hue[self.variable].quantile(0.75) - df_hue[self.variable].quantile(0.25)
+                        whiskers.append(df_hue[self.variable].quantile(0.75) + iqr * 1.5)
+                else:
+                    iqr = df[self.variable].quantile(0.75) - df[self.variable].quantile(0.25)
+                    whiskers.append(df[self.variable].quantile(0.75) + iqr * 1.5)
+            return max(whiskers)
+        return self.df[self.variable].max()
+
 
     def save(self, picture_path: str = "",
              file_prefix: str = "",
@@ -224,15 +249,6 @@ class BoxAnova:
         if self.method not in ["bonf", "sidak"]:
             raise ValueError("Method must be either bonf or sidak")
 
-    @property
-    def start_point(self):
-        return self.alpha_boarders.index(self.alpha)
-
-    @property
-    def max_value_on_scale(self):
-        if self.box_kws.get("showfliers", True) is False:
-            return self.df[self.variable].quantile(0.975)
-        return self.df[self.variable].max()
 
     def plot_box_plot(self, hue: str = None, hue_order: list[str] = None, formatting_text: bool = True,
                       position_title: float = 1.04, position_offset: float = 0.05
@@ -438,6 +454,7 @@ class BoxAnova:
 
         if hue not in self.df.columns:
             raise ValueError(f"{hue} not in columns")
+        self.hue = hue
         if not hue_order:
             hue_order = list(self.df[hue].unique())
         if fine_tuning_kws is None:
@@ -445,7 +462,7 @@ class BoxAnova:
         self.plot_box_plot(hue=hue, hue_order=hue_order, **fine_tuning_kws)
         if show_group:
             self.calc_sig_levels_group(hue=True)
-        # ['Female|Voice Female', 'Female|Chatbot Female', 'Female|filter', 'Male|Voice Female', 'Male|Chatbot Female', 'Male|filter']
+
         self.df["temp_group"] = self.df[self.group].astype(str) + "|" + self.df[hue].astype(str)
         group_order = [f"{i}|{j}" for i in self.order for j in hue_order]
         mean_dif, df_res = self._calc_sig(group_order=group_order, annotation=not show_group)  # Calc p-value
