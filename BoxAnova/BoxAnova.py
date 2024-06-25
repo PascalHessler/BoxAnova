@@ -337,14 +337,18 @@ class BoxAnova:
 
     def p_value_sig(self, p_value: float, mean_dif_single: float) -> str:
         # Überprüfen, ob p-Wert signifikant ist
-        if p_value < self.alpha_boarders[self.start_point - 2]:
-            text = f"{mean_dif_single:.2f}***"
-        elif p_value < self.alpha_boarders[self.start_point - 1]:
-            text = f"{mean_dif_single:.2f}**"
-        elif p_value < self.alpha_boarders[self.start_point]:
-            text = f"{mean_dif_single:.2f}*"
+        if abs(mean_dif_single) > 10000:
+            mean_text = f"{mean_dif_single:e}"
         else:
-            text = f"{mean_dif_single:.2f}"
+            mean_text = f"{mean_dif_single:.2f}"
+        if p_value < self.alpha_boarders[self.start_point - 2]:
+            text = f"{mean_text}***"
+        elif p_value < self.alpha_boarders[self.start_point - 1]:
+            text = f"{mean_text}**"
+        elif p_value < self.alpha_boarders[self.start_point]:
+            text = f"{mean_text}*"
+        else:
+            text = f"{mean_text}"
         return text
 
     def calc_tick_x_line(self, i, j, k, position_offset: float = 0, fix_position: bool = False) \
