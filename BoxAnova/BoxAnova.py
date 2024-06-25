@@ -175,6 +175,7 @@ class BoxAnova:
         self.fig = None
         self.ax = None
         self.hue = None
+        self.hue_order = None
 
         self.kwargs = kwargs
 
@@ -210,7 +211,6 @@ class BoxAnova:
                     whiskers.append(df[self.variable].quantile(0.75) + iqr * 1.5)
             return max(whiskers)
         return self.df[self.variable].max()
-
 
     def save(self, picture_path: str = "",
              file_prefix: str = "",
@@ -248,7 +248,6 @@ class BoxAnova:
 
         if self.method not in ["bonf", "sidak"]:
             raise ValueError("Method must be either bonf or sidak")
-
 
     def plot_box_plot(self, hue: str = None, hue_order: list[str] = None, formatting_text: bool = True,
                       position_title: float = 1.04, position_offset: float = 0.05
@@ -444,7 +443,8 @@ class BoxAnova:
             j = self.order.index(str(row.values[1]))
 
             tick_size, x_line, y_text = self.calc_tick_x_line(
-                position_offset=self.max_value_on_scale * rate_position_offset_with_hue if hue else 0,
+                position_offset=self.max_value_on_scale * rate_position_offset_with_hue * (len(
+                    self.hue_order) - 1) if hue else 0,
                 i=i, j=j, k=k)
             self.draw_lines(i, j, tick_size, x_line)
             sig_text = self.p_value_sig(self.get_p_value(row), mean_dif.meandiffs[k - 1])
@@ -452,18 +452,34 @@ class BoxAnova:
 
     def calc_sig_levels_hue(self, hue, hue_order: list[str] = None, show_group: bool = True,
                             fine_tuning_kws: dict = None):
+        """
+        First draws the boxplot and then calculates the significant levels for the group variable,
+        with an additional offset so the groups are right to the later drawn hue levels.
+        Then calculate the significant levels for the hue variable, which are drawn on the left side of the group values.
+        :param hue:
+        :param hue_order:
+        :param show_group:
+        :param fine_tuning_kws:
+        :return:
+        """
 
         if hue not in self.df.columns:
             raise ValueError(f"{hue} not in columns")
         self.hue = hue
         if not hue_order:
             hue_order = list(self.df[hue].unique())
+            self.hue_order = hue_order
         if fine_tuning_kws is None:
             fine_tuning_kws = {}
+
+        # plotting base boxplot
         self.plot_box_plot(hue=hue, hue_order=hue_order, **fine_tuning_kws)
+
+        # plotting sig levels for the group variable
         if show_group:
             self.calc_sig_levels_group(hue=True)
 
+        # Now starting for the hue elements
         self.df["temp_group"] = self.df[self.group].astype(str) + "|" + self.df[hue].astype(str)
         group_order = [f"{i}|{j}" for i in self.order for j in hue_order]
         mean_dif, df_res = self._calc_sig(group_order=group_order, annotation=not show_group)  # Calc p-value
@@ -484,7 +500,7 @@ class BoxAnova:
                 # based on hue order
                 i = group_start + hue_1_mid
                 j = group_start + hue_2_mid
-                tick_size, x_line, y_text = self.calc_tick_x_line(position_offset=self.max_value_on_scale*0.01,
+                tick_size, x_line, y_text = self.calc_tick_x_line(position_offset=self.max_value_on_scale * 0.01,
                                                                   i=i, j=j, k=k)
                 self.draw_lines(i, j, tick_size, x_line)
                 index = df_res[(df_res["group1"] == name_group_1) & (df_res["group2"] == name_group_2)].index
