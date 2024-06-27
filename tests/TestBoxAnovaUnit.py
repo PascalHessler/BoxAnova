@@ -48,14 +48,14 @@ class TestBoxAnova(unittest.TestCase):
 
         # Erstellen Sie einen DataFrame aus den Daten
         self.df = pd.DataFrame(data, columns=["group", "hue", "value1", "value2", "value3", "value4"])
-        self.box_anova = BoxAnova(df=self.df,variable="value1", group="group")
+        self.box_anova = BoxAnova(df=self.df, variable="value1", group="group")
 
     def test_init(self):
         pd.testing.assert_frame_equal(self.box_anova.df, self.df)
         self.assertEqual(self.box_anova.variable, 'value1')
         self.assertEqual(self.box_anova.group, 'group')
         self.assertEqual(self.box_anova.order, ['Group1', 'Group2', 'Group3'])
-        self.assertEqual(self.box_anova.title,  "Anova of 'Value1' by Group")
+        self.assertEqual(self.box_anova.title, "Anova of 'Value1' by Group")
 
     def test_invalid_alpha_value(self):
         with self.assertRaises(ValueError, msg="alpha must be in [0.001, 0.01, 0.05, 0.1]"):
@@ -100,13 +100,17 @@ class TestBoxAnova(unittest.TestCase):
         multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
                            display='group')
 
+    def test_fine_tuning(self):
+        multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
+                           display='group', fine_tuning_kws={"show_n": False})
+
     def test_multi_group_no_fliers(self):
         multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
                            display='group', box_kws={"showfliers": False})
 
     def test_multi_group_hue(self):
         multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
-                           hue="hue")#
+                           hue="hue")  #
 
     def test_multi_group_hue_no_fliers(self):
         multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",

@@ -25,6 +25,13 @@ class Labels(TypedDict, total=True):
     seperator: str
 
 
+class FineTuningKWS(TypedDict, total=False):
+    formatting_text: bool
+    show_n: bool
+    position_title: float
+    position_offset: float
+
+
 def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str = None, hue_order: list[str] = None,
                        display: Literal['group', 'hue', 'both'] = 'both', all_separate: bool = False,
                        orient: Literal["v", "h"] = "h",
@@ -38,6 +45,7 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
                        labels: Labels = None,
                        show_fig: bool = True,
                        box_kws: dict = None,
+                       fine_tuning_kws: FineTuningKWS = None,
                        **kwargs):
     """
     Generating BoxPlots for multiple variables
@@ -62,6 +70,7 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
     :param labels: TBA
     :param show_fig: If True the plots will be shown
     :param box_kws: Additional arguments for the boxplot passed to seaborn.boxplot
+    :param finetuning_kws: Arguments are
     :param kwargs: Additional arguments for the BoxAnova class
     :return:
     """
@@ -83,6 +92,8 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
         notes = [notes for _ in range(len(variables))]
     if isinstance(additional_texts, str):
         additional_texts = [additional_texts for _ in range(len(variables))]
+    if fine_tuning_kws is None:
+        fine_tuning_kws = {}
 
     if hue and group != "group":
         display: Literal['group', 'hue', 'both'] = "group"
@@ -95,16 +106,16 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
             file_prefix = settings_save.get('file_prefix', "")
             settings_save["file_prefix"] = f"group_{file_prefix}"
             box.generate_box_plot(hue=hue, hue_order=hue_order, display="group", save=save_to_file, show=show_fig,
-                                  settings_save=settings_save, )
+                                  settings_save=settings_save, fine_tuning_kws=fine_tuning_kws)
             settings_save["file_prefix"] = f"hue_{file_prefix}"
             box.generate_box_plot(hue=hue, hue_order=hue_order, display="hue", save=save_to_file, show=show_fig,
-                                  settings_save=settings_save)
+                                  settings_save=settings_save, fine_tuning_kws=fine_tuning_kws)
             settings_save["file_prefix"] = f"both_{file_prefix}"
             box.generate_box_plot(hue=hue, hue_order=hue_order, display="both", save=save_to_file, show=show_fig,
-                                  settings_save=settings_save)
+                                  settings_save=settings_save, fine_tuning_kws=fine_tuning_kws)
         else:
             box.generate_box_plot(hue=hue, hue_order=hue_order, display=display, save=save_to_file, show=show_fig,
-                                  settings_save=settings_save)
+                                  settings_save=settings_save, fine_tuning_kws=fine_tuning_kws)
 
 
 class BoxAnova:
@@ -250,7 +261,7 @@ class BoxAnova:
             raise ValueError("Method must be either bonf or sidak")
 
     def plot_box_plot(self, hue: str = None, hue_order: list[str] = None, formatting_text: bool = True,
-                      position_title: float = 1.04, position_offset: float = 0.05
+                      position_title: float = 1.04, position_offset: float = 0.05, show_n: bool = False
                       ):
         def update_labels(axis, labels, df, group, order):
             for i, label in enumerate(labels):
@@ -285,7 +296,6 @@ class BoxAnova:
                                   )
         if formatting_text:
             renaming(self.ax)
-        show_n = True
         if show_n:
             if self.orient == "h":
                 labels = [item.get_text() for item in self.ax.get_yticklabels()]
@@ -405,7 +415,7 @@ class BoxAnova:
 
     def generate_box_plot(self, hue: str = None, hue_order: list[str] = None,
                           display: Literal['group', 'hue', 'both'] = 'group', save=False, show=True,
-                          settings_save: SaveSettings = None):
+                          settings_save: SaveSettings = None, fine_tuning_kws: dict = None):
 
         if display not in ['group', 'hue', 'both']:
             raise ValueError("display must be either 'group', 'hue' or 'both'")
@@ -414,11 +424,12 @@ class BoxAnova:
 
         match display:
             case 'group':
-                self.calc_sig_levels_group(hue=False)
+                self.calc_sig_levels_group(hue=False, fine_tuning_kws=fine_tuning_kws)
             case 'hue':
-                self.calc_sig_levels_hue(hue=hue, hue_order=hue_order, show_group=False)
+                self.calc_sig_levels_hue(hue=hue, hue_order=hue_order, show_group=False,
+                                         fine_tuning_kws=fine_tuning_kws)
             case 'both':
-                self.calc_sig_levels_hue(hue=hue, hue_order=hue_order, show_group=True)
+                self.calc_sig_levels_hue(hue=hue, hue_order=hue_order, show_group=True, fine_tuning_kws=fine_tuning_kws)
             case _:
                 raise TypeError(f"Unexpected value for 'display' {display}. "
                                 f"Only ['group', 'hue', 'both'] are valid options.")
@@ -438,7 +449,8 @@ class BoxAnova:
 
         plt.close()
 
-    def calc_sig_levels_group(self, hue=False, rate_position_offset_with_hue=0.15, fine_tuning_kws: dict = None):
+    def calc_sig_levels_group(self, hue=False, rate_position_offset_with_hue=0.15,
+                              fine_tuning_kws: FineTuningKWS = None):
         if fine_tuning_kws is None:
             fine_tuning_kws = {}
         if self.ax is None:
@@ -462,7 +474,7 @@ class BoxAnova:
             self.draw_sig_level(sig_text, tick_size, x_line, y_text)
 
     def calc_sig_levels_hue(self, hue, hue_order: list[str] = None, show_group: bool = True,
-                            fine_tuning_kws: dict = None):
+                            fine_tuning_kws: FineTuningKWS = None):
         """
         First draws the boxplot and then calculates the significant levels for the group variable,
         with an additional offset so the groups are right to the later drawn hue levels.
