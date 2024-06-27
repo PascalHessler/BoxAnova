@@ -84,7 +84,7 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
     if isinstance(additional_texts, str):
         additional_texts = [additional_texts for _ in range(len(variables))]
 
-    if not hue and group != "group":
+    if hue and group != "group":
         display: Literal['group', 'hue', 'both'] = "group"
         warnings.warn("Hue is not provided. Display type was changed to 'group'")
 
@@ -252,6 +252,12 @@ class BoxAnova:
     def plot_box_plot(self, hue: str = None, hue_order: list[str] = None, formatting_text: bool = True,
                       position_title: float = 1.04, position_offset: float = 0.05
                       ):
+        def update_labels(axis, labels, df, group, order):
+            for i, label in enumerate(labels):
+                n_str = df[df[group] == order[i]].shape[0]
+                labels[i] += f"\n $\mathbb{{N}}={n_str}$"
+            axis.set_ticklabels(labels)
+
         # make sure canvas is clear
         plt.close()
         # prep arguments
@@ -279,6 +285,14 @@ class BoxAnova:
                                   )
         if formatting_text:
             renaming(self.ax)
+        show_n = True
+        if show_n:
+            if self.orient == "h":
+                labels = [item.get_text() for item in self.ax.get_yticklabels()]
+                update_labels(self.ax.yaxis, labels, self.df, self.group, self.order)
+            else:
+                labels = [item.get_text() for item in self.ax.get_xticklabels()]
+                update_labels(self.ax.xaxis, labels, self.df, self.group, self.order)
 
         # calculation position
         position_height = position_title
