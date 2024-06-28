@@ -267,7 +267,9 @@ class BoxAnova:
             for i, label in enumerate(labels):
                 n_str = df[df[group] == order[i]].shape[0]
                 labels[i] += f"\n $\mathbb{{N}}={n_str}$"
-            axis.set_ticklabels(labels)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", category=UserWarning)
+                axis.set_ticklabels(labels)
 
         # make sure canvas is clear
         plt.close()
