@@ -5,7 +5,6 @@ import pandas as pd
 import os
 from scipy.stats import f_oneway, ttest_ind
 import statsmodels.stats.multicomp as mc
-import math
 from typing import Literal, TypedDict
 import warnings
 from BoxAnova.utils.renaming import formatting, renaming
