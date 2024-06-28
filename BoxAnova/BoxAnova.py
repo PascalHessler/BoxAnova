@@ -95,9 +95,9 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
     if fine_tuning_kws is None:
         fine_tuning_kws = {}
 
-    if hue and group != "group":
-        display: Literal['group', 'hue', 'both'] = "group"
-        warnings.warn("Hue is not provided. Display type was changed to 'group'")
+    # if hue and group != "group":
+    #     display: Literal['group', 'hue', 'both'] = "group"
+    #     warnings.warn("Hue is not provided. Display type was changed to 'group'")
 
     for title, subtitle, note, additional_texts, var in zip(titles, subtitles, notes, additional_texts, variables):
         box = BoxAnova(df=data, variable=var, group=group, title=title, subtitle=subtitle, note=note,
