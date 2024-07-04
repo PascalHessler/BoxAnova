@@ -128,6 +128,7 @@ class BoxAnova:
                  method: Literal["bonf", "sidak"] = "bonf",
                  alpha: float = 0.1,
                  use_corrected_p: bool = True,
+                 show_p_value: bool = False,
 
                  palette=sns.color_palette('colorblind'),
                  background_color: str = "white",
@@ -162,6 +163,7 @@ class BoxAnova:
         self.group = group
 
         self.alpha = alpha
+        self.show_p_value = show_p_value
 
         self.title = title
         self.subtitle = subtitle
@@ -297,6 +299,7 @@ class BoxAnova:
                                   )
         if formatting_text:
             renaming(self.ax)
+
         if show_n:
             if self.orient == "h":
                 labels = [item.get_text() for item in self.ax.get_yticklabels()]
@@ -365,6 +368,10 @@ class BoxAnova:
             mean_text = f"{mean_dif_single:e}"
         else:
             mean_text = f"{mean_dif_single:.2f}"
+
+        if self.show_p_value:
+            return f"{mean_text}({p_value:.2f})"
+
         if p_value < self.alpha_boarders[self.start_point - 2]:
             text = f"{mean_text}***"
         elif p_value < self.alpha_boarders[self.start_point - 1]:

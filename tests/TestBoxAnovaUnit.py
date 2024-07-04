@@ -100,6 +100,10 @@ class TestBoxAnova(unittest.TestCase):
         multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
                            display='group')
 
+    def test_multi_group_show_p(self):
+        multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
+                           display='group', show_p_value=True)
+
     def test_fine_tuning(self):
         multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
                            display='group', fine_tuning_kws={"show_n": False})

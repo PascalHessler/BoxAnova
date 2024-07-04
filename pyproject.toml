@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "boxanova"
-version = "0.1.7"
+version = "0.1.8"
 description = ""
 authors = ["PascalHessler <PascalHessler@outlook.de>"]
 readme = "README.md"
