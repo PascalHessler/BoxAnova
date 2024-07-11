@@ -415,11 +415,22 @@ class BoxAnova:
             plt.text(s=sig_text, x=y_text, y=x_line + tick_size / 1.8 - tick_size, rotation=0, **settings_text)
 
     def annotation_text(self, result_oneway: float) -> str:
-        return (f"Anova p={result_oneway:.2f}, post-hoc {self.method}, α={self.alpha} \n Mean difference "
-                f"*p < {self.alpha_boarders[self.start_point]}, "
-                f"** p < {self.alpha_boarders[self.start_point - 1]}, "
-                f"*** p < {self.alpha_boarders[self.start_point - 2]} \n "
-                f"{self.note} {self.additional_text}")
+        text = ""
+        # showing Anova result only if more than two groups
+        if len(self.order) > 2:
+            text = f"Anova p={result_oneway:.2f}, post-hoc {self.method}, α={self.alpha}"
+        # different annotation when p_values are shown as number or stars
+        if self.show_p_value:
+            text = text + "\n Annotation: Mean difference (p-value)"
+        else:
+            text = (text + " \n Annotation:  Mean difference "
+                           f"*p < {self.alpha_boarders[self.start_point]}, "
+                           f"** p < {self.alpha_boarders[self.start_point - 1]}, "
+                           f"*** p < {self.alpha_boarders[self.start_point - 2]}")
+        # only adds note and additional text if they are not empty
+        if self.note or self.additional_text:
+            text = text + f"\n {self.note} {self.additional_text}"
+        return text
 
     def generate_box_plot(self, hue: str = None, hue_order: list[str] = None,
                           display: Literal['group', 'hue', 'both'] = 'group', save=False, show=True,
