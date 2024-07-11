@@ -370,7 +370,7 @@ class BoxAnova:
             mean_text = f"{mean_dif_single:.2f}"
 
         if self.show_p_value:
-            return f"{mean_text}({p_value:.2f})"
+            return f"{mean_text} ({p_value:.2f})"
 
         if p_value < self.alpha_boarders[self.start_point - 2]:
             text = f"{mean_text}***"
@@ -418,12 +418,12 @@ class BoxAnova:
         text = ""
         # showing Anova result only if more than two groups
         if len(self.order) > 2:
-            text = f"Anova p={result_oneway:.2f}, post-hoc {self.method}, α={self.alpha}"
+            text = f"Anova p={result_oneway:.2f}, post-hoc {self.method}, α={self.alpha} \n"
         # different annotation when p_values are shown as number or stars
         if self.show_p_value:
-            text = text + "\n Annotation: Mean difference (p-value)"
+            text = text + "Annotation: Mean difference (p-value)"
         else:
-            text = (text + " \n Annotation:  Mean difference "
+            text = (text + "Annotation:  Mean difference "
                            f"*p < {self.alpha_boarders[self.start_point]}, "
                            f"** p < {self.alpha_boarders[self.start_point - 1]}, "
                            f"*** p < {self.alpha_boarders[self.start_point - 2]}")
