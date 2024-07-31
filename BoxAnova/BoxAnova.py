@@ -93,7 +93,8 @@ def multiple_box_anova(variables: list, data: pd.DataFrame, group: str, hue: str
         additional_texts = [additional_texts for _ in range(len(variables))]
     if fine_tuning_kws is None:
         fine_tuning_kws = {}
-
+    if settings_save is None:
+        settings_save = {}
     # if hue and group != "group":
     #     display: Literal['group', 'hue', 'both'] = "group"
     #     warnings.warn("Hue is not provided. Display type was changed to 'group'")
