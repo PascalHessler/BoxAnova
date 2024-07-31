@@ -190,6 +190,9 @@ class BoxAnova:
         self.hue = None
         self.hue_order = []
 
+        self.violin = kwargs.get("violin", False)
+        self.stripplot = kwargs.get("stripplot", False)
+
         self.kwargs = kwargs
 
         if box_kws is None:
@@ -295,9 +298,18 @@ class BoxAnova:
                 x = self.group
                 y = self.variable
 
-            self.ax = sns.boxplot(data=self.df, x=x, y=y, order=self.order, ax=self.ax, palette=self.palette,
-                                  **optional_params, **self.box_kws
-                                  )
+            if self.violin:
+                self.ax = sns.violinplot(data=self.df, x=x, y=y, order=self.order, ax=self.ax, palette=self.palette,
+                                         **optional_params, inner="quart"
+                                         )
+            else:
+                self.ax = sns.boxplot(data=self.df, x=x, y=y, order=self.order, ax=self.ax, palette=self.palette,
+                                      **optional_params, **self.box_kws
+                                      )
+                if self.stripplot:
+                    sns.stripplot(data=self.df, x=x, y=y, order=self.order, **optional_params, dodge=True if hue else False , ax=self.ax,
+                                  palette=self.palette, legend=False, alpha=0.7, jitter=0.2, edgecolor='black',
+                                  linewidth=0.5)
         if formatting_text:
             renaming(self.ax)
 
