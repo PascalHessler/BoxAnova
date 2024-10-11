@@ -447,7 +447,7 @@ class BoxAnova:
 
     def generate_box_plot(self, hue: str = None, hue_order: list[str] = None,
                           display: Literal['group', 'hue', 'both'] = 'group', save=False, show=True,
-                          settings_save: SaveSettings = None, fine_tuning_kws: dict = None):
+                          settings_save: SaveSettings = None, fine_tuning_kws: FineTuningKWS = None):
 
         if display not in ['group', 'hue', 'both']:
             raise ValueError("display must be either 'group', 'hue' or 'both'")

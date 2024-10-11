@@ -48,7 +48,7 @@ class TestBoxAnova(unittest.TestCase):
 
         # Erstellen Sie einen DataFrame aus den Daten
         self.df = pd.DataFrame(data, columns=["group", "hue", "value1", "value2", "value3", "value4"])
-        self.box_anova = BoxAnova(df=self.df, variable="value1", group="group")
+        self.box_anova = BoxAnova(df=self.df, variable="value2", group="group")
 
     def test_init(self):
         pd.testing.assert_frame_equal(self.box_anova.df, self.df)
@@ -96,6 +96,29 @@ class TestBoxAnova(unittest.TestCase):
         except Exception as e:
             self.fail(f"generate_box_plot method raised exception {e}")
 
+    def test_generate_box_plot_with_hue(self):
+        # Test that generate_box_plot method works without raising an exception
+        try:
+            self.box_anova.generate_box_plot(display='hue', hue="hue")
+        except Exception as e:
+            self.fail(f"generate_box_plot method raised exception {e}")
+
+    def test_generate_box_plot_show_n(self):
+        # Test that generate_box_plot method works without raising an exception
+        try:
+            self.box_anova.generate_box_plot(display='group', fine_tuning_kws={"show_n": True})
+        except Exception as e:
+            self.fail(f"generate_box_plot method raised exception {e}")
+
+    def test_generate_box_plot_show_p(self):
+        # Test that generate_box_plot method works without raising an exception
+        self.box_anova.show_p_value = True
+        try:
+            self.box_anova.generate_box_plot(display='group')
+        except Exception as e:
+            self.fail(f"generate_box_plot method raised exception {e}")
+        self.box_anova.show_p_value = False
+
     def test_multi_group(self):
         multiple_box_anova(variables=["value1", "value2", "value3", "value4"], data=self.df, group="group",
                            display='group')
@@ -128,9 +151,14 @@ class TestBoxAnova(unittest.TestCase):
     #     with self.assertRaises(ValueError, msg="Invalid order not in list of groups"):
     #         BoxAnova(df=self.df, variable="value", group="group", order=["Invalid"])
     #
-    # def invalid_orient_value(self):
-    #     with self.assertRaises(ValueError, msg="Orient must be either 'v' or 'h'"):
-    #         BoxAnova(df=self.df, variable="value", group="group", orient="invalid")
+    def test_generate_with_orient(self):
+        # Test that generate_box_plot method works without raising an exception
+        self.box_anova.orient = "v"
+        try:
+            self.box_anova.generate_box_plot(display='group')
+        except Exception as e:
+            self.fail(f"generate_box_plot method raised exception {e}")
+        self.box_anova.orient = "h"
     #
     # def invalid_palette_value(self):
     #     with self.assertRaises(ValueError, msg="Invalid palette"):
